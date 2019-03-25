@@ -1,10 +1,14 @@
 var express = require('express')
 var request = require('request')
+const nocache = require('nocache')
+
+
 var app = express()
 var openhabHost = 'localhost'
 if(process.argv.length > 2) {
     openhabHost = process.argv[2];
 }
+
 
 
 var indicatorAppResponse = {
@@ -42,7 +46,7 @@ function callOpenHabAPI(itemName) {
         })
 }
 
-
+app.use(nocache())
 app.get('/tempIndicator', function (req, res) {
     
     callOpenHabAPI('ASH2200Temp1').then(function(result) {
