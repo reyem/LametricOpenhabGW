@@ -1,0 +1,20 @@
+[Unit]
+Description=Indicator app proxy infront of rest api of openhab for displaying temperature on lametric
+
+[Service]
+ExecStart=/usr/local/bin/node /home/pi/indicatorAppTranslator/app/src/index.js localhost
+# Required on some systems
+#WorkingDirectory=/opt/nodeserver
+Restart=always
+# Restart service after 10 seconds if node service crashes
+RestartSec=10
+# Output to syslog
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=indicatorAppTranslator
+User=pi
+Group=pi
+#Environment=NODE_ENV=production PORT=1337
+
+[Install]
+WantedBy=multi-user.target
