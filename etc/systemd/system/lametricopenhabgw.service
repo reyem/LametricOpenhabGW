@@ -1,8 +1,8 @@
 [Unit]
-Description=Indicator app proxy infront of rest api of openhab for displaying temperature on lametric
+Description=lametric openhab gateway bridges lametric and the openhab rest api in both directions.
 
 [Service]
-ExecStart=/usr/local/bin/node /home/pi/indicatorAppTranslator/app/src/index.js localhost
+ExecStart=/usr/local/bin/node /home/pi/LametricOpenhabGW/app/src/index.js /etc/lametricopenhabgw/config.json
 # Required on some systems
 #WorkingDirectory=/opt/nodeserver
 Restart=always
@@ -11,7 +11,7 @@ RestartSec=10
 # Output to syslog
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=indicatorAppTranslator
+SyslogIdentifier=LametricOpenhabGW
 User=pi
 Group=pi
 #Environment=NODE_ENV=production PORT=1337

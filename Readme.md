@@ -36,11 +36,11 @@ Note: This is a pragmatic tailored script and lots of things are hard coded in t
 ````
 cd app
 npm install
-node src/index.js <ip-of-openhab-api>
+node src/index.js <configfile>
 ````
 
 ## Systemd
-for systemd there is a service configuration file under ``/etc/systemd/system/indicatorapp.service``.
+for systemd there is a service configuration file under ``/etc/systemd/system/lametricopenhabgw.service``.
 
 # Test
 ````

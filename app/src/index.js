@@ -1,67 +1,69 @@
-var express = require('express')
-var request = require('request')
+const express = require('express')
+const request = require('request')
 const nocache = require('nocache')
 
+const app = express()
+var configFile = '../../etc/lametricopenhabgw/config.json'
 
-var app = express()
-var openhabHost = 'localhost'
-if(process.argv.length > 2) {
-    openhabHost = process.argv[2];
+if (process.argv.length > 2) {
+    configFile = process.argv[2];
 }
 
+const config = require(configFile);
+var openhabHost = config.openhabHost;
+var openhabPort = config.openhabPort;
+
+const itemFinderRegexp = /\$\{([A-Za-z0-9_-]+)\}/g;
 
 
-var indicatorAppResponse = {
-    "frames": [
-        {
-            "text": "10 °C",
-            "icon": "i4285"
-        },
-        {
-            "text": "20 °C",
-            "icon": "i4286"
-        }
-    ]
+async function asyncForEach(array, callback) {
+    for (let index = 0; index < array.length; index++) {
+        await callback(array[index], index, array);
+    }
 }
 
 
 function callOpenHabAPI(itemName) {
-        var options = {
-            url: 'http://' + openhabHost +':8080/rest/items/' + itemName,
-            headers: {
-                'User-Agent': 'request'
-            }
-        };
+    var options = {
+        url: 'http://' + openhabHost + ':' + openhabPort + '/rest/items/' + itemName,
+        headers: {
+            'User-Agent': 'request'
+        }
+    };
 
-        // Return new promise 
-        return new Promise(function(resolve, reject) {
-            // Do async job
-            request.get(options, function(err, resp, body) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(JSON.parse(body));
-                }
-            })
+    // Return new promise 
+    return new Promise(function (resolve, reject) {
+        // Do async job
+        request.get(options, function (err, resp, body) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(JSON.parse(body));
+            }
         })
+    })
 }
 
 app.use(nocache())
+
 app.get('/tempIndicator', function (req, res) {
-    
-    callOpenHabAPI('ASH2200Temp1').then(function(result) {
-         indicatorAppResponse.frames[0].text = result.state + "°C";
-         callOpenHabAPI('LivingRoomTemp').then(function(result) {
-            indicatorAppResponse.frames[1].text = result.state + "°C";
-            res.send(indicatorAppResponse);
-         }, function(err) {
-            console.log(err);
-            res.send(err);
+    const execute = async () => {
+        var response = config.pollingApps.tempIndicator.responseTemplate;
+        var responseStr = JSON.stringify(response)
+        
+        var items = responseStr.match(itemFinderRegexp)
+        await asyncForEach(items, async (item) => {
+            item = item.substring(2, item.length -1)
+            await callOpenHabAPI(item).then(function (result) {                         
+                responseStr = responseStr.replace(new RegExp('\\$\\{' + item + '\\}'), result.state)
+            }, function (err) {
+                console.log(err);
+            })
         })
-    }, function(err) {
-        console.log(err);
-        res.send(err);
-    })
+
+        res.send(JSON.parse(responseStr));
+    }
+    execute()
 })
- 
+
 app.listen(3000)

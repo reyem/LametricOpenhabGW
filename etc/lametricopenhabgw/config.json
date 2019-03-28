@@ -1,0 +1,20 @@
+{
+    "openhabHost": "192.168.1.201",
+    "openhabPort": "8080",
+    "pollingApps": {
+        "tempIndicator": {
+            "responseTemplate": {
+                "frames": [
+                    {
+                        "text": "${ASH2200Temp1} °C",
+                        "icon": "i4285"
+                    },
+                    {
+                        "text": "${LivingRoomTemp} °C",
+                        "icon": "i4286"
+                    }
+                ]
+            }
+        }
+    }
+}
