@@ -1,20 +1,26 @@
 {
-    "openhabHost": "192.168.1.201",
+    "openhabHost": "openhabhost",
     "openhabPort": "8080",
     "pollingApps": {
-        "tempIndicator": {
-            "responseTemplate": {
-                "frames": [
-                    {
-                        "text": "${ASH2200Temp1} °C",
-                        "icon": "i4285"
-                    },
-                    {
-                        "text": "${LivingRoomTemp} °C",
-                        "icon": "i4286"
-                    }
-                ]
-            }
+        "temperatureApp": {
+            "frames": [
+                {
+                    "text": "${item1} °C",
+                    "icon": "i4285"
+                },
+                {
+                    "text": "${item2} °C",
+                    "icon": "i4286"
+                }
+            ]
+        },
+        "mowerApp": {
+            "frames": [
+                {
+                    "hello": "${item3} mower status",
+                    "icon": "i4285"
+                }
+            ]
         }
     }
 }
