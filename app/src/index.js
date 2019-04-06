@@ -53,13 +53,7 @@ function callOpenHabAPI(itemName) {
     })
 }
 
-//             'Authorization': 'Basic ' + Buffer.from('dev:' + config.lametricAPIKey).toString('base64')
-
-function callLametricNotificationAPI(message, reply) {
-    notificationMessage.model.frames[0].icon = "i16587"
-    notificationMessage.model.frames[0].text = message
-    notificationMessage.model.sound.id = "water2"
-    notificationMessage.model.cycles = 0
+function callLametricNotificationAPI(message, reply) {    
    var options = {
         uri: 'https://' + config.lametricHost + ':4343/api/v2/device/notifications',
         headers: {
@@ -69,7 +63,7 @@ function callLametricNotificationAPI(message, reply) {
             'Authorization': 'Basic ' + Buffer.from('dev:' + config.lametricAPIKey).toString('base64')
         },       
         method: 'POST',
-        body: JSON.stringify( notificationMessage),
+        body: message,
          "rejectUnauthorized": false, 
     };
 
@@ -87,24 +81,35 @@ function callLametricNotificationAPI(message, reply) {
 app.use(nocache())
 
 for(var pollingApp in config.pollingApps ) {
-    console.log('deploy app /' + pollingApp)
-    app.get('/' + pollingApp, function (req, res) {
-        execute = async () => {
+    console.log('deploy polling app /' + pollingApp)
+    app.get('/' + pollingApp, getPollingAppHandlerFunction(pollingApp))
+}
+
+function getPollingAppHandlerFunction(pollingApp) {
+    return async function (req, res) {        
             const itemFinderRegexp = /\$\{([A-Za-z0-9_-]+)\}/g;
             const response = config.pollingApps[pollingApp];            
             var responseStr = JSON.stringify(response)            
             responseStr = await resolveItems(responseStr, itemFinderRegexp);
-            res.send(JSON.parse(responseStr));
-        }
-        execute()
-    })
+            res.send(JSON.parse(responseStr));        
+    };
 }
 
-app.get("/washing", function(req, res) {
-    callLametricNotificationAPI("Wäsche fertig", function(response) { res.send(response) });
-    // TODO implement via config
-})
+for(var notifcationApp in config.notificationApps ) {
+    console.log('deploy notification app /' + notifcationApp)
+    app.get('/' + notifcationApp, getNotificationAppHandlerFunction(notifcationApp))
+}
 
+function getNotificationAppHandlerFunction(notifcationApp) {
+    return async function (req, res) {        
+            const itemFinderRegexp = /\$\{([A-Za-z0-9_-]+)\}/g;
+            const message = config.notificationApps[notifcationApp];  
+            var responseStr = JSON.stringify(message)   
+            responseStr = await resolveItems(responseStr, itemFinderRegexp);
+            callLametricNotificationAPI(responseStr);  
+            res.send('{"success" : "true"}');     
+    };
+}
 
 app.listen(3000)
 
