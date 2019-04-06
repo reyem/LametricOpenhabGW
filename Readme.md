@@ -17,6 +17,8 @@ You need
 {
     "openhabHost": "openhabhost",
     "openhabPort": "8080",
+    "lametricHost": "lametric"
+    "lametricAPIKey" : "the key you get from developer.lametric.dom"
     "pollingApps": {
         "temperatureApp": {
             "frames": [
@@ -33,7 +35,7 @@ You need
         "mowerApp": {
             "frames": [
                 {
-                    "hello": "${item3} mower status",
+                    "text": "${item3} mower status",
                     "icon": "i4285"
                 }
             ]
