@@ -1,6 +1,8 @@
 {
-    "openhabHost": "openhabhost",
+    "openhabHost": "openhab",
     "openhabPort": "8080",
+    "lametricHost": "lametric",
+    "lametricAPIKey": "enterkeyhere",
     "pollingApps": {
         "temperatureApp": {
             "frames": [
@@ -21,6 +23,25 @@
                     "icon": "i4285"
                 }
             ]
+        }
+    },
+
+    "notificationApps" : {
+        "laundryDone" : {
+            "priority": "info",
+            "model": {
+                "cycles": 0,
+                "frames": [
+                   {
+                      "icon": "i16587",
+                      "text": "Wäsche fertig! Gestartet ${WaescheStart}"
+                   }
+                ],
+                "sound": {
+                    "category": "notifications",
+                    "id": "water1"
+                }
+            }
         }
     }
 }
