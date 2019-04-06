@@ -68,8 +68,7 @@ function callLametricNotificationAPI(message, reply) {
     };
 
     request(options, function (error, response, body) {
-        if (!error) {
-            console.log("success" + response.statusCode)
+        if (!error) {            
             reply(response) // Print the shortened url.
         }else {
             console.log("error")
@@ -106,8 +105,9 @@ function getNotificationAppHandlerFunction(notifcationApp) {
             const message = config.notificationApps[notifcationApp];  
             var responseStr = JSON.stringify(message)   
             responseStr = await resolveItems(responseStr, itemFinderRegexp);
-            callLametricNotificationAPI(responseStr);  
-            res.send('{"success" : "true"}');     
+            callLametricNotificationAPI(responseStr, function(response) {
+                res.send(response);
+            });               
     };
 }
 
@@ -115,6 +115,7 @@ app.listen(3000)
 
 async function resolveItems(responseStr, itemFinderRegexp) {
     var items = responseStr.match(itemFinderRegexp);
+    if(items != null) {
     await asyncForEach(items, async (item) => {
         item = item.substring(2, item.length - 1);
         await callOpenHabAPI(item).then(function (result) {
@@ -123,5 +124,6 @@ async function resolveItems(responseStr, itemFinderRegexp) {
             console.log(err);
         });
     });
+    }
     return responseStr;
 }
